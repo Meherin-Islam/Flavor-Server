@@ -277,6 +277,16 @@ async function run() {
       }
     ]).toArray();
 
+    const revenue = result.length > 0 ? result[0].totalRevenue : 0;
+
+    res.send({
+      users,
+      menuItems,
+      orders,
+      revenue
+    })
+  })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
