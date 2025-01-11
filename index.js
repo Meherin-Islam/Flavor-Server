@@ -256,6 +256,27 @@ async function run() {
   })
 
 
+   // stats or analytics
+   app.get('/admin-stats', verifyToken, verifyAdmin, async (req, res) => {
+    const users = await userCollection.estimatedDocumentCount();
+    const menuItems = await menuCollection.estimatedDocumentCount();
+    const orders = await paymentCollection.estimatedDocumentCount();
+
+    // this is not the best way
+    // const payments = await paymentCollection.find().toArray();
+    // const revenue = payments.reduce((total, payment) => total + payment.price, 0);
+
+    const result = await paymentCollection.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalRevenue: {
+            $sum: '$price'
+          }
+        }
+      }
+    ]).toArray();
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
